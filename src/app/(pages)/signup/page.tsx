@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -19,18 +22,39 @@ export default function SignUpPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simple client-side password match check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     setError("");
-    // TODO: Gửi dữ liệu lên API để tạo tài khoản
-    console.log("Sign up with:", formData);
+
+    try {
+      const res = await fetch("/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Registration failed");
+      } else {
+        alert(data.message || "Registration successful! Redirecting to login...");
+        router.push("/login");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError("Server error. Please try again later.");
+    }
   };
 
   return (
@@ -42,8 +66,8 @@ export default function SignUpPage() {
           <p className="mb-4 text-red-500 text-center font-medium">{error}</p>
         )}
 
-
-        <div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
             <label className="block text-sm font-medium mb-1">Username</label>
             <input
               type="text"
@@ -53,8 +77,8 @@ export default function SignUpPage() {
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
