@@ -12,6 +12,11 @@ export async function GET(req: Request) {
   const createdTo = searchParams.get('createdTo');
   const updatedFrom = searchParams.get('updatedFrom');
   const updatedTo = searchParams.get('updatedTo');
+  const sortBy = searchParams.get('sortBy') || 'createdAt';
+  const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+
+  const validSortFields = ['createdAt', 'favoritesCount'];
+  const orderBy: Record<string, 'asc' | 'desc'> = {};
 
   const cursor = searchParams.get('cursor');
   const take = parseInt(searchParams.get('take') || '10');
@@ -19,6 +24,12 @@ export async function GET(req: Request) {
   const filters: any = {
     status: PostStatus.ACTIVE,
   };
+
+  if (validSortFields.includes(sortBy)) {
+    orderBy[sortBy] = sortOrder;
+  } else {
+    orderBy['createdAt'] = 'desc';
+  }
 
   if (title) {
     filters.title = { contains: title, mode: 'insensitive' };
@@ -56,7 +67,7 @@ export async function GET(req: Request) {
     const posts = await prisma.post.findMany({
       where: filters,
       include: { author: true, category: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       take,
       skip: cursor ? 1 : 0,
       cursor: cursor ? { id: Number(cursor) } : undefined,

@@ -3,6 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCategoryColor } from '@/lib/utils';
+import type { SortField, SortOrder } from './SortBar';
+
+interface Props {
+  sortField: SortField;
+  sortOrder: SortOrder;
+}
 
 interface Category {
   id: number;
@@ -14,7 +20,7 @@ interface User {
   name: string;
 }
 
-export default function PostFilter() {
+export default function PostFilter({ sortField, sortOrder }: Props) {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -23,21 +29,14 @@ export default function PostFilter() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    // Fetch categories
     fetch('/api/categories')
       .then(res => res.json())
       .then(data => setCategories(data));
 
-    // Fetch authors with at least one post
     fetch('/api/users/with-posts')
       .then(res => res.json())
       .then(data => setAuthors(data));
   }, []);
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
-    setSelectedCategories(options);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +46,9 @@ export default function PostFilter() {
     if (title) query.set('title', title);
     if (author) query.set('authorId', author);
     selectedCategories.forEach(cat => query.append('category', cat));
+
+    query.set('sortBy', sortField);
+    query.set('sortOrder', sortOrder);
 
     router.push(`/?${query.toString()}`);
   };
@@ -81,29 +83,30 @@ export default function PostFilter() {
         </div>
 
         <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <div className="space-y-1">
             {categories.map(cat => (
-            <label key={cat.id} className="flex items-center space-x-2">
+              <label key={cat.id} className="flex items-center space-x-2">
                 <input
-                type="checkbox"
-                value={cat.id}
-                checked={selectedCategories.includes(cat.id.toString())}
-                onChange={e => {
+                  type="checkbox"
+                  value={cat.id}
+                  checked={selectedCategories.includes(cat.id.toString())}
+                  onChange={e => {
                     const id = e.target.value;
                     setSelectedCategories(prev =>
-                    e.target.checked
+                      e.target.checked
                         ? [...prev, id]
                         : prev.filter(catId => catId !== id)
                     );
-                }}
+                  }}
                 />
-                <span className={`${getCategoryColor(cat.name)} text-white text-sm px-2 py-0.5 rounded-full`}>#{cat.name}</span>
-            </label>
+                <span className={`${getCategoryColor(cat.name)} text-white text-sm px-2 py-0.5 rounded-full`}>
+                  #{cat.name}
+                </span>
+              </label>
             ))}
+          </div>
         </div>
-        </div>
-
 
         <button
           type="submit"

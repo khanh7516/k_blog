@@ -85,7 +85,7 @@ export default function PostList() {
   }
 
   return (
-    <div className="mt-6 max-w-2xl w-full mx-auto mb-8">
+    <div className="max-w-2xl w-full mx-auto mb-8">
       {posts.map((post, index) => (
         <PostCard
           key={post.id}
