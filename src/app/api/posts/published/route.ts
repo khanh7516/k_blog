@@ -15,7 +15,7 @@ export async function GET(req: Request) {
   const sortBy = searchParams.get('sortBy') || 'createdAt';
   const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
-  const validSortFields = ['createdAt', 'favoritesCount'];
+  const validSortFields = ['createdAt', 'favoritesCount', 'commentsCount'];
   const orderBy: Record<string, 'asc' | 'desc'> = {};
 
   const cursor = searchParams.get('cursor');

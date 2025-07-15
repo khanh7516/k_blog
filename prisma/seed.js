@@ -118,6 +118,10 @@ async function main() {
 
       allComments.push(comment);
     }
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { commentsCount: commentCount },
+    });
   }
 
   for (const comment of allComments) {

@@ -39,6 +39,7 @@ model Post {
   favorites  PostFavorite[]
   favoritesCount Int            @default(0)
   comments   Comment[]
+  commentsCount Int            @default(0)
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 }

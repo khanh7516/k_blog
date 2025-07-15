@@ -1,6 +1,7 @@
 import React from 'react';
 import { Post } from '../../../types/post';
 import { getCategoryColor } from '@/lib/utils';
+import PostActions from './PostActions';
 
 interface PostCardProps {
   post: Post;
@@ -49,6 +50,10 @@ export default function PostCard({ post, isLast = false, isExpanded, onToggle }:
 
       </div>
       {!isLast && <hr className="border-gray-300 opacity-50 my-4" />}
+      <PostActions
+        favoriteCount={post.favoritesCount}
+        commentCount={post.commentsCount}
+      />
     </>
   );
 }

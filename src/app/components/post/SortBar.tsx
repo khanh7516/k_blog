@@ -27,6 +27,7 @@ export default function SortBar({
         >
           <option value="createdAt">Created At</option>
           <option value="favoritesCount">Favorite</option>
+          <option value="commentsCount">Comment</option>
         </select>
       </div>
 
